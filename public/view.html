@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💌 Surat Untukmu</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Lato',sans-serif;min-height:100vh;background:linear-gradient(135deg,#fff0f5,#ffe4ef,#ffd6e7);display:flex;align-items:center;justify-content:center;padding:20px}
+  .envelope{background:#fff;border-radius:20px;padding:40px;width:100%;max-width:600px;box-shadow:0 20px 60px rgba(233,30,140,0.2);position:relative;overflow:hidden}
+  .envelope::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#e91e8c,#f48fb1,#e91e8c)}
+  .deco{text-align:center;font-size:2.5rem;margin-bottom:8px}
+  .date{text-align:right;font-size:0.82rem;color:#ad1457;font-style:italic;margin-bottom:24px}
+  .greeting{font-family:'Playfair Display',serif;font-size:1.15rem;color:#880e4f;margin-bottom:20px}
+  .body{font-family:'Playfair Display',serif;font-size:1.05rem;color:#333;line-height:1.95;white-space:pre-wrap;font-style:italic;margin-bottom:24px;padding:20px;background:#fff9fc;border-radius:12px;border-left:4px solid #f48fb1}
+  .hearts{text-align:center;color:#e91e8c;font-size:1.4rem;letter-spacing:8px;margin:20px 0}
+  .sign{font-family:'Playfair Display',serif;text-align:right;color:#880e4f;font-size:1.1rem}
+  .music{background:linear-gradient(135deg,#fce4ec,#f8bbd0);border-radius:12px;padding:4px;margin-top:24px}
+  .music-label{padding:10px 16px;font-size:0.82rem;font-weight:700;color:#880e4f}
+  .music iframe{width:100%;height:200px;border:none;border-radius:10px;display:block}
+  .loading{text-align:center;padding:60px 20px;color:#ad1457}
+  .loading .spinner{width:40px;height:40px;border:3px solid #f8bbd0;border-top-color:#e91e8c;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .not-found{text-align:center;padding:60px 20px;color:#c62828}
+  .not-found .icon{font-size:3rem;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="envelope" id="container">
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Membuka surat cintamu... 💌</p>
+  </div>
+</div>
+
+<script>
+// Ambil ID dari URL: /letter/a3f2bc91 → id = "a3f2bc91"
+const id = window.location.pathname.split('/').pop();
+
+function getYouTubeId(url) {
+  if (!url) return null;
+  const patterns = [/[?&]v=([^&#]+)/, /youtu\.be\/([^?&#]+)/, /embed\/([^?&#]+)/];
+  for (let p of patterns) { const m = url.match(p); if (m) return m[1]; }
+  return null;
+}
+
+// Fetch data surat dari backend menggunakan ID
+fetch(`/api/letters/${id}`)
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) throw new Error(data.error);
+
+    const ytId = getYouTubeId(data.youtubeUrl);
+    const musicHTML = ytId ? `
+      <div class="music">
+        <div class="music-label">🎵 Lagu spesial untukmu</div>
+        <iframe src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0" 
+                allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>` : '';
+
+    const date = new Date(data.createdAt).toLocaleDateString('id-ID',{
+      weekday:'long', year:'numeric', month:'long', day:'numeric'
+    });
+
+    document.title = `💌 Surat untuk ${data.to}`;
+    document.getElementById('container').innerHTML = `
+      <div class="deco">💌</div>
+      <div class="date">${date}</div>
+      <div class="greeting">Kepada yang tersayang, <strong>${data.to}</strong>...</div>
+      <div class="body">${data.message}</div>
+      <div class="hearts">♥ ♥ ♥</div>
+      <div class="sign">Dengan segenap cinta,<br><strong>${data.from}</strong> 💕</div>
+      ${musicHTML}
+    `;
+  })
+  .catch(() => {
+    document.getElementById('container').innerHTML = `
+      <div class="not-found">
+        <div class="icon">💔</div>
+        <h2>Surat tidak ditemukan</h2>
+        <p style="margin-top:8px;font-size:0.9rem;color:#ad1457">Link mungkin salah atau sudah tidak tersedia</p>
+      </div>`;
+  });
+</script>
+</body>
+</html>

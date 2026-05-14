@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💌 Love Letter Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Lato',sans-serif;min-height:100vh;background:linear-gradient(135deg,#fff0f5 0%,#ffe4ef 50%,#ffd6e7 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+  body::before{content:'♥ ♡ ♥ ♡ ♥ ♡ ♥ ♡';position:fixed;top:10px;left:0;right:0;text-align:center;color:#f8bbd0;font-size:1.2rem;letter-spacing:20px;animation:float 3s ease-in-out infinite;pointer-events:none}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .card{background:#fff;border-radius:20px;padding:40px;width:100%;max-width:560px;box-shadow:0 20px 60px rgba(233,30,140,0.15)}
+  .header{text-align:center;margin-bottom:32px}
+  .header .icon{font-size:3rem;margin-bottom:8px}
+  .header h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:#c2185b;font-style:italic}
+  .header p{color:#e91e8c;font-size:0.82rem;letter-spacing:2px;margin-top:4px}
+  .form-group{margin-bottom:20px}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  label{display:block;font-size:0.78rem;font-weight:700;color:#ad1457;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+  input[type=text],input[type=url],textarea{width:100%;padding:12px 16px;border:1.5px solid #f8bbd0;border-radius:10px;font-family:'Lato',sans-serif;font-size:0.95rem;color:#333;background:#fff9fc;transition:border-color 0.2s,box-shadow 0.2s;outline:none}
+  input:focus,textarea:focus{border-color:#e91e8c;box-shadow:0 0 0 3px rgba(233,30,140,0.1);background:#fff}
+  textarea{min-height:140px;resize:vertical;line-height:1.7}
+  .hint{font-size:0.75rem;color:#e91e8c;margin-top:6px;opacity:0.8}
+  #yt-preview{display:none;margin-top:12px;border-radius:10px;overflow:hidden;border:2px solid #f8bbd0}
+  #yt-preview iframe{width:100%;height:200px;border:none;display:block}
+  .yt-label{background:linear-gradient(135deg,#fce4ec,#f8bbd0);padding:8px 14px;font-size:0.8rem;color:#880e4f;font-weight:700}
+  .btn-submit{width:100%;padding:15px;background:linear-gradient(135deg,#e91e8c,#c2185b);color:#fff;border:none;border-radius:12px;font-family:'Lato',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.3s;margin-top:8px}
+  .btn-submit:hover{opacity:0.9;transform:translateY(-2px);box-shadow:0 8px 25px rgba(233,30,140,0.35)}
+  .btn-submit:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+  #result-box{display:none;background:linear-gradient(135deg,#fce4ec,#fff9fc);border:2px solid #f48fb1;border-radius:14px;padding:24px;margin-top:24px;text-align:center;animation:slideIn 0.4s ease}
+  @keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  #result-box h3{font-family:'Playfair Display',serif;color:#880e4f;margin-bottom:8px}
+  #result-box p{font-size:0.85rem;color:#ad1457;margin-bottom:16px}
+  .link-display{display:flex;gap:8px;background:#fff;border:1.5px solid #f8bbd0;border-radius:10px;padding:12px 14px;align-items:center}
+  .link-display span{flex:1;font-size:0.85rem;color:#c2185b;font-weight:700;word-break:break-all;font-family:monospace}
+  .btn-copy{padding:8px 16px;background:#e91e8c;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:700;white-space:nowrap;transition:background 0.2s}
+  .btn-copy:hover{background:#c2185b}
+  .copied-msg{color:#4caf50;font-size:0.82rem;font-weight:700;margin-top:8px;display:none}
+  .error-msg{background:#ffebee;border:1px solid #ef9a9a;color:#c62828;border-radius:8px;padding:10px 14px;font-size:0.85rem;margin-top:12px;display:none}
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="icon">💌</div>
+    <h1>Love Letter Generator</h1>
+    <p>✦ TULIS DARI HATI, KIRIM DENGAN CINTA ✦</p>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Dari 💕</label>
+      <input type="text" id="from" placeholder="Nama kamu..." maxlength="50"/>
+    </div>
+    <div class="form-group">
+      <label>Untuk 💌</label>
+      <input type="text" id="to" placeholder="Nama dia..." maxlength="50"/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Pesan Cintamu 💬</label>
+    <textarea id="message" placeholder="Tuliskan perasaanmu di sini...&#10;&#10;Jangan malu, ini rahasia kita berdua 🌸"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label>🎵 Link Lagu YouTube</label>
+    <input type="url" id="ytlink" placeholder="https://www.youtube.com/watch?v=..." oninput="previewYoutube(this.value)"/>
+    <p class="hint">💡 Paste link YouTube lagu favorit kalian</p>
+    <div id="yt-preview">
+      <div class="yt-label">🎵 Preview Lagu</div>
+      <iframe id="yt-frame" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    </div>
+  </div>
+
+  <div class="error-msg" id="error-msg"></div>
+
+  <button class="btn-submit" id="submit-btn" onclick="saveLetter()">
+    💌 Buat & Dapatkan Link Surat
+  </button>
+
+  <div id="result-box">
+    <h3>🎉 Surat Berhasil Dibuat!</h3>
+    <p>Copy link ini dan kirim ke dia via WhatsApp 💕</p>
+    <div class="link-display">
+      <span id="share-link-text"></span>
+      <button class="btn-copy" onclick="copyLink()">Copy</button>
+    </div>
+    <div class="copied-msg" id="copied-msg">✅ Link berhasil di-copy!</div>
+  </div>
+</div>
+
+<script>
+function previewYoutube(url) {
+  const id = getYouTubeId(url);
+  const preview = document.getElementById('yt-preview');
+  const frame   = document.getElementById('yt-frame');
+  if (id) {
+    frame.src = `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1`;
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+    frame.src = '';
+  }
+}
+
+function getYouTubeId(url) {
+  if (!url) return null;
+  const patterns = [/[?&]v=([^&#]+)/, /youtu\.be\/([^?&#]+)/, /embed\/([^?&#]+)/];
+  for (let p of patterns) {
+    const m = url.match(p);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+async function saveLetter() {
+  const from    = document.getElementById('from').value.trim();
+  const to      = document.getElementById('to').value.trim();
+  const message = document.getElementById('message').value.trim();
+  const ytlink  = document.getElementById('ytlink').value.trim();
+
+  showError('');
+  if (!from || !to || !message) { showError('Isi semua field yang wajib ya 🌸'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled  = true;
+  btn.innerHTML = '<span class="spinner"></span>Menyimpan surat...';
+
+  try {
+    const response = await fetch('/api/letters', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to, message, youtubeUrl: ytlink })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Terjadi kesalahan');
+    document.getElementById('share-link-text').textContent = data.shareUrl;
+    document.getElementById('result-box').style.display = 'block';
+    document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
+  } catch (err) {
+    showError('⚠️ Gagal menyimpan. Pastikan server berjalan! ' + err.message);
+  } finally {
+    btn.disabled  = false;
+    btn.innerHTML = '💌 Buat & Dapatkan Link Surat';
+  }
+}
+
+async function copyLink() {
+  const link = document.getElementById('share-link-text').textContent;
+  try { await navigator.clipboard.writeText(link); }
+  catch {
+    const el = document.createElement('textarea');
+    el.value = link; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+  }
+  const msg = document.getElementById('copied-msg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 3000);
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent   = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
