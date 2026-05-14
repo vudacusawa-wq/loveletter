@@ -11,7 +11,7 @@ const path = require("path"); // Utility untuk path file (bawaan Node.js)
 const fs = require("fs"); // Baca/tulis file (bawaan Node.js)
 
 const app = express(); // Buat instance aplikasi Express
-const PORT = process.env.PORT || 3000; // Port server berjalan
+const PORT = process.env.PORT || 8080; // Port server berjalan
 
 // ── MIDDLEWARE ─────────────────────────────
 // Middleware = fungsi yang jalan SEBELUM request sampai ke route handler
@@ -22,6 +22,11 @@ app.use(express.static("public")); // Sajikan file HTML/CSS/JS dari folder 'publ
 // ── DATABASE SEDERHANA (file JSON) ─────────
 // Untuk belajar, kita pakai file JSON sebagai "database"
 // Di production nyata, pakai MySQL / PostgreSQL / MongoDB
+// Auto buat folder data kalau belum ada
+const DATA_DIR = path.join(__dirname, "data");
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
 const DB_FILE = path.join(__dirname, "data", "letters.json");
 
 // Fungsi baca semua surat dari file JSON
