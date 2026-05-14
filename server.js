@@ -73,13 +73,14 @@ app.post("/api/letters", (req, res) => {
 
   saveLetters(letters); // Tulis ke file JSON
 
-// ✅ baseUrl harus di LUAR .json(), sebelum res.status
-const baseUrl = process.env.APP_URL || `http://localhost:${PORT}`;
+  // ✅ baseUrl harus di LUAR .json(), sebelum res.status
+  const baseUrl = process.env.APP_URL || `http://localhost:${PORT}`;
 
-res.status(201).json({
-  success: true,
-  id,
-  shareUrl: `${baseUrl}/letter/${id}`,
+  res.status(201).json({
+    success: true,
+    id,
+    shareUrl: `${baseUrl}/letter/${id}`,
+  });
 });
 
 // ── GET /api/letters/:id ───────────────────
