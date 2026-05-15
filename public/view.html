@@ -6,82 +6,139 @@
 <title>💌 Surat Untukmu</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Lato',sans-serif;min-height:100vh;background:linear-gradient(135deg,#fff0f5,#ffe4ef,#ffd6e7);display:flex;align-items:center;justify-content:center;padding:20px}
-  .envelope{background:#fff;border-radius:20px;padding:40px;width:100%;max-width:600px;box-shadow:0 20px 60px rgba(233,30,140,0.2);position:relative;overflow:hidden}
-  .envelope::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#e91e8c,#f48fb1,#e91e8c)}
-  .deco{text-align:center;font-size:2.5rem;margin-bottom:8px}
-  .date{text-align:right;font-size:0.82rem;color:#ad1457;font-style:italic;margin-bottom:24px}
-  .greeting{font-family:'Playfair Display',serif;font-size:1.15rem;color:#880e4f;margin-bottom:20px}
-  .body{font-family:'Playfair Display',serif;font-size:1.05rem;color:#333;line-height:1.95;white-space:pre-wrap;font-style:italic;margin-bottom:24px;padding:20px;background:#fff9fc;border-radius:12px;border-left:4px solid #f48fb1}
-  .hearts{text-align:center;color:#e91e8c;font-size:1.4rem;letter-spacing:8px;margin:20px 0}
-  .sign{font-family:'Playfair Display',serif;text-align:right;color:#880e4f;font-size:1.1rem}
-  .music{background:linear-gradient(135deg,#fce4ec,#f8bbd0);border-radius:12px;padding:4px;margin-top:24px}
-  .music-label{padding:10px 16px;font-size:0.82rem;font-weight:700;color:#880e4f}
-  .music iframe{width:100%;height:200px;border:none;border-radius:10px;display:block}
-  .loading{text-align:center;padding:60px 20px;color:#ad1457}
-  .loading .spinner{width:40px;height:40px;border:3px solid #f8bbd0;border-top-color:#e91e8c;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .not-found{text-align:center;padding:60px 20px;color:#c62828}
-  .not-found .icon{font-size:3rem;margin-bottom:12px}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Lato', sans-serif; min-height: 100vh; background: linear-gradient(135deg, #fff0f5, #ffe4ef, #ffd6e7); display: flex; align-items: center; justify-content: center; padding: 20px; overflow-x: hidden; }
+  .loading { text-align: center; color: #ad1457; }
+  .loading .spinner { width: 50px; height: 50px; border: 4px solid #f8bbd0; border-top-color: #e91e8c; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .scene { display: flex; align-items: center; justify-content: center; gap: 40px; width: 100%; max-width: 900px; }
+  .flowers { font-size: 5rem; display: flex; flex-direction: column; gap: 10px; animation: flowerSway 3s ease-in-out infinite; user-select: none; line-height: 1; }
+  .flowers.right { animation-delay: 0.5s; }
+  @keyframes flowerSway { 0%, 100% { transform: rotate(-5deg) translateY(0); } 50% { transform: rotate(5deg) translateY(-10px); } }
+  .envelope-wrap { position: relative; width: 340px; cursor: pointer; user-select: none; }
+  .click-hint { text-align: center; color: #e91e8c; font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .envelope { width: 340px; height: 220px; background: linear-gradient(135deg, #fff0f5, #fce4ec); border-radius: 8px; position: relative; box-shadow: 0 10px 40px rgba(233, 30, 140, 0.25); transition: transform 0.3s; border: 2px solid #f8bbd0; }
+  .envelope:hover { transform: scale(1.03); }
+  .envelope::before { content: ''; position: absolute; bottom: 0; left: 0; border-left: 170px solid #f48fb1; border-right: 170px solid transparent; border-bottom: 110px solid #f48fb1; }
+  .envelope::after { content: ''; position: absolute; bottom: 0; right: 0; border-right: 170px solid #ec407a; border-left: 170px solid transparent; border-bottom: 110px solid #ec407a; }
+  .envelope-flap { position: absolute; top: 0; left: 0; width: 100%; border-left: 170px solid transparent; border-right: 170px solid transparent; border-top: 130px solid #f06292; transform-origin: top center; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); z-index: 3; }
+  .envelope-wrap.opened .envelope-flap { transform: rotateX(180deg); }
+  .envelope-seal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.5rem; z-index: 4; transition: all 0.3s; }
+  .envelope-wrap.opened .envelope-seal { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+  .letter-paper { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(0); width: 300px; background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 2; clip-path: inset(100% 0 0 0); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s; border: 1px solid #f8bbd0; max-height: 180px; overflow: hidden; }
+  .envelope-wrap.opened .letter-paper { clip-path: inset(0% 0 0 0); transform: translateX(-50%) translateY(-120px); }
+  .letter-preview-text { font-family: 'Playfair Display', serif; font-size: 0.8rem; color: #ad1457; font-style: italic; line-height: 1.6; text-align: center; }
+  .letter-full { display: none; background: #fff; border-radius: 20px; padding: 40px; width: 100%; max-width: 560px; box-shadow: 0 20px 60px rgba(233, 30, 140, 0.2); position: relative; overflow: hidden; animation: letterAppear 0.6s ease; }
+  @keyframes letterAppear { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .letter-full::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #e91e8c, #f48fb1, #e91e8c); }
+  .letter-deco { text-align: center; font-size: 2.5rem; margin-bottom: 8px; }
+  .letter-date { text-align: right; font-size: 0.82rem; color: #ad1457; font-style: italic; margin-bottom: 20px; }
+  .letter-to { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: #880e4f; margin-bottom: 16px; }
+  .letter-body { font-family: 'Playfair Display', serif; font-size: 1rem; color: #333; line-height: 1.95; white-space: pre-wrap; font-style: italic; margin-bottom: 20px; padding: 20px; background: #fff9fc; border-radius: 12px; border-left: 4px solid #f48fb1; }
+  .letter-hearts { text-align: center; color: #e91e8c; font-size: 1.4rem; letter-spacing: 8px; margin: 16px 0; }
+  .letter-from { font-family: 'Playfair Display', serif; text-align: right; color: #880e4f; font-size: 1.05rem; }
+  .music { background: linear-gradient(135deg, #fce4ec, #f8bbd0); border-radius: 12px; padding: 4px; margin-top: 20px; }
+  .music-label { padding: 10px 16px; font-size: 0.82rem; font-weight: 700; color: #880e4f; }
+  .music iframe { width: 100%; height: 200px; border: none; border-radius: 10px; display: block; }
+  .not-found { text-align: center; padding: 60px 20px; color: #c62828; }
+  .not-found .icon { font-size: 3rem; margin-bottom: 12px; }
+  @media (max-width: 600px) {
+    .flowers { font-size: 2.5rem; gap: 4px; }
+    .scene { gap: 12px; }
+    .envelope-wrap, .envelope { width: 240px; height: 155px; }
+    .envelope-flap { border-left-width: 120px; border-right-width: 120px; border-top-width: 90px; }
+    .envelope::before { border-left-width: 120px; border-right-width: 120px; border-bottom-width: 78px; }
+    .envelope::after { border-right-width: 120px; border-left-width: 120px; border-bottom-width: 78px; }
+    .letter-paper { width: 200px; }
+  }
 </style>
 </head>
 <body>
-<div class="envelope" id="container">
-  <div class="loading">
-    <div class="spinner"></div>
-    <p>Membuka surat cintamu... 💌</p>
-  </div>
+
+<div id="loading" class="loading">
+  <div class="spinner"></div>
+  <p>Membuka surat cintamu... 💌</p>
 </div>
 
+<div id="scene" class="scene" style="display:none">
+  <div class="flowers left">🌸<br>🌺<br>🌸<br>🌷<br>🌸</div>
+
+  <div class="envelope-wrap" id="envelope" onclick="openEnvelope()">
+    <div class="click-hint" id="click-hint">💌 Klik untuk membuka</div>
+    <div class="envelope">
+      <div class="envelope-flap"></div>
+      <div class="envelope-seal">💝</div>
+      <div class="letter-paper">
+        <div class="letter-preview-text" id="preview-text">...ada surat cinta untukmu 🌸</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flowers right">🌷<br>🌸<br>🌺<br>🌸<br>🌷</div>
+</div>
+
+<div id="letter-full" class="letter-full"></div>
+
 <script>
-// Ambil ID dari URL: /letter/a3f2bc91 → id = "a3f2bc91"
-const id = window.location.pathname.split('/').pop();
+  const id = window.location.pathname.split('/').pop();
+  let letterData = null;
 
-function getYouTubeId(url) {
-  if (!url) return null;
-  const patterns = [/[?&]v=([^&#]+)/, /youtu\.be\/([^?&#]+)/, /embed\/([^?&#]+)/];
-  for (let p of patterns) { const m = url.match(p); if (m) return m[1]; }
-  return null;
-}
+  function getYouTubeId(url) {
+    if (!url) return null;
+    const patterns = [/[?&]v=([^&#]+)/, /youtu\.be\/([^?&#]+)/, /embed\/([^?&#]+)/];
+    for (let p of patterns) { const m = url.match(p); if (m) return m[1]; }
+    return null;
+  }
 
-// Fetch data surat dari backend menggunakan ID
-fetch(`/api/letters/${id}`)
-  .then(r => r.json())
-  .then(data => {
-    if (data.error) throw new Error(data.error);
+  function openEnvelope() {
+    const envelope = document.getElementById('envelope');
+    if (envelope.classList.contains('opened')) return;
+    envelope.classList.add('opened');
+    document.getElementById('click-hint').style.display = 'none';
+    setTimeout(() => { showFullLetter(); }, 1200);
+  }
 
+  function showFullLetter() {
+    document.getElementById('scene').style.display = 'none';
+    const data = letterData;
     const ytId = getYouTubeId(data.youtubeUrl);
     const musicHTML = ytId ? `
       <div class="music">
         <div class="music-label">🎵 Lagu spesial untukmu</div>
-        <iframe src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0" 
-                allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <iframe src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>` : '';
-
-    const date = new Date(data.createdAt).toLocaleDateString('id-ID',{
-      weekday:'long', year:'numeric', month:'long', day:'numeric'
-    });
-
-    document.title = `💌 Surat untuk ${data.to}`;
-    document.getElementById('container').innerHTML = `
-      <div class="deco">💌</div>
-      <div class="date">${date}</div>
-      <div class="greeting">Kepada yang tersayang, <strong>${data.to}</strong>...</div>
-      <div class="body">${data.message}</div>
-      <div class="hearts">♥ ♥ ♥</div>
-      <div class="sign">Dengan segenap cinta,<br><strong>${data.from}</strong> 💕</div>
+    const date = new Date(data.createdAt).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('letter-full').innerHTML = `
+      <div class="letter-deco">💌</div>
+      <div class="letter-date">${date}</div>
+      <div class="letter-to">Kepada yang tersayang, <strong>${data.to}</strong>...</div>
+      <div class="letter-body">${data.message}</div>
+      <div class="letter-hearts">♥ ♥ ♥</div>
+      <div class="letter-from">Dengan segenap cinta,<br><strong>${data.from}</strong> 💕</div>
       ${musicHTML}
     `;
-  })
-  .catch(() => {
-    document.getElementById('container').innerHTML = `
-      <div class="not-found">
-        <div class="icon">💔</div>
-        <h2>Surat tidak ditemukan</h2>
-        <p style="margin-top:8px;font-size:0.9rem;color:#ad1457">Link mungkin salah atau sudah tidak tersedia</p>
-      </div>`;
-  });
+    document.getElementById('letter-full').style.display = 'block';
+  }
+
+  fetch(`/api/letters/${id}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) throw new Error(data.error);
+      letterData = data;
+      document.title = `💌 Surat untuk ${data.to}`;
+      document.getElementById('preview-text').textContent = `Untuk ${data.to}... ada sesuatu yang ingin aku sampaikan 🌸`;
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('scene').style.display = 'flex';
+    })
+    .catch(() => {
+      document.getElementById('loading').innerHTML = `
+        <div class="not-found">
+          <div class="icon">💔</div>
+          <h2>Surat tidak ditemukan</h2>
+          <p style="margin-top:8px;font-size:0.9rem;color:#ad1457">Link mungkin salah atau sudah tidak tersedia</p>
+        </div>`;
+    });
 </script>
 </body>
 </html>
