@@ -113,7 +113,7 @@ app.get("/letter/:id", (req, res) => {
 });
 
 // ── START SERVER ───────────────────────────
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`
   ╔══════════════════════════════════════╗
   ║   💌 Love Letter Server Running!     ║
